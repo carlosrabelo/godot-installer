@@ -44,3 +44,15 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then begin
+    if MsgBox('Do you want to delete all data files?', mbConfirmation, MB_YESNO) = IDYES 
+    then begin
+      DelTree(ExpandConstant('{app}'), False, True, True);
+      //first False makes that the main Directory will not be deleted by function but it will be by the end of Uninstallation
+    end;
+  end;
+end;

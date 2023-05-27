@@ -11,6 +11,8 @@ Instituto Federal de Mato Grosso. As an instructor of game development, my aim i
 - **Time-Saving**: With a single click, you can install or update the Godot Engine on multiple computers simultaneously, saving time compared to manual setups.
 - **Consistency**: By utilizing the installer, we ensure uniformity across all computers in the lab, avoiding discrepancies caused by manual installations.
 
+For more information about the Godot Engine, please visit the [official Godot Engine website](https://godotengine.org/).
+
 ## Feedback
 
 If you have any questions, encounter issues, or need assistance with the Godot Engine Installer, please feel free to reach out.

@@ -1,0 +1,108 @@
+name: Build Installers
+
+# Builds the Godot 3 and Godot 4 Windows installers with Inno Setup.
+#
+# The Godot versions are read straight from the `#define MyAppVersion`
+# line inside each Godot.iss, so bumping a version is a single-line edit.
+#
+# Triggers:
+#   * push  -> rebuilds whenever an .iss (or this workflow) changes
+#   * manual-> same, plus an option to publish a GitHub Release
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'godot3/Godot.iss'
+      - 'godot4/Godot.iss'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Publish a GitHub Release with the built installers'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write   # required by `gh release create`
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read versions from the .iss files
+        id: ver
+        shell: bash
+        run: |
+          g3=$(grep -oP '#define MyAppVersion "\K[^"]+' godot3/Godot.iss)
+          g4=$(grep -oP '#define MyAppVersion "\K[^"]+' godot4/Godot.iss)
+          echo "Godot 3 version: $g3"
+          echo "Godot 4 version: $g4"
+          echo "g3=$g3" >> "$GITHUB_OUTPUT"
+          echo "g4=$g4" >> "$GITHUB_OUTPUT"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup -y --no-progress
+
+      - name: Download Godot 3 binary
+        shell: pwsh
+        run: |
+          $v = "${{ steps.ver.outputs.g3 }}"
+          $url = "https://github.com/godotengine/godot/releases/download/$v-stable/Godot_v$v-stable_win64.exe.zip"
+          Write-Host "Downloading $url"
+          Invoke-WebRequest -Uri $url -OutFile godot3\bin.zip
+          Expand-Archive -Path godot3\bin.zip -DestinationPath godot3 -Force
+          Remove-Item godot3\bin.zip
+
+      - name: Download Godot 4 binary
+        shell: pwsh
+        run: |
+          $v = "${{ steps.ver.outputs.g4 }}"
+          $url = "https://github.com/godotengine/godot/releases/download/$v-stable/Godot_v$v-stable_win64.exe.zip"
+          Write-Host "Downloading $url"
+          Invoke-WebRequest -Uri $url -OutFile godot4\bin.zip
+          Expand-Archive -Path godot4\bin.zip -DestinationPath godot4 -Force
+          Remove-Item godot4\bin.zip
+
+      - name: Compile Godot 3 installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { $iscc = "ISCC.exe" }
+          & $iscc "godot3\Godot.iss"
+
+      - name: Compile Godot 4 installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { $iscc = "ISCC.exe" }
+          & $iscc "godot4\Godot.iss"
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-installers
+          path: |
+            godot3/Output/*.exe
+            godot4/Output/*.exe
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_release == true }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="installers-${{ steps.ver.outputs.g3 }}-${{ steps.ver.outputs.g4 }}-$(date -u +%Y%m%d%H%M%S)"
+          printf 'Automated build:\n- Godot %s-stable\n- Godot %s-stable\n' \
+            "${{ steps.ver.outputs.g3 }}" "${{ steps.ver.outputs.g4 }}" > notes.md
+          gh release create "$tag" \
+            godot3/Output/*.exe godot4/Output/*.exe \
+            --title "Godot Installers ${{ steps.ver.outputs.g3 }} / ${{ steps.ver.outputs.g4 }}" \
+            --notes-file notes.md

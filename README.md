@@ -1,5 +1,7 @@
 # Godot Installer
 
+[![Build Installers](https://github.com/carlosrabelo/godot-installer/actions/workflows/build.yml/badge.svg)](https://github.com/carlosrabelo/godot-installer/actions/workflows/build.yml)
+
 This repository contains a custom installer for the Godot Engine, created to streamline the installation and updating process on the computers in our computer lab at the
 Instituto Federal de Mato Grosso. As an instructor of game development, my aim is to provide a hassle-free setup experience for our students, and this installer is designed to achieve just that.
 

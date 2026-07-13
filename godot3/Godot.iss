@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Godot"
-#define MyAppVersion "3.5.2"
+#define MyAppVersion "3.6.2"
 #define MyAppPublisher "Juan Linietsky, Ariel Manzur and contributors"
 #define MyAppURL "https://godotengine.org/"
-#define MyAppExeName "Godot_v3.5.2-stable_win64.exe"
+#define MyAppExeName "Godot_v" + MyAppVersion + "-stable_win64.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -22,13 +22,16 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=Godot_v3.5.2-install_win64
+OutputDir=Output
+OutputBaseFilename=Godot_v{#MyAppVersion}-install_win64
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+ArchitecturesInstallIn64BitMode=x64
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -43,3 +46,15 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then begin
+    if MsgBox('Do you want to delete all data files?', mbConfirmation, MB_YESNO) = IDYES 
+    then begin
+      DelTree(ExpandConstant('{app}'), False, True, True);
+      //first False makes that the main Directory will not be deleted by function but it will be by the end of Uninstallation
+    end;
+  end;
+end;

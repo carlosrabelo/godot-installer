@@ -6,8 +6,8 @@ name: Build Installers
 # line inside each Godot.iss, so bumping a version is a single-line edit.
 #
 # Triggers:
-#   * push  -> rebuilds whenever an .iss (or this workflow) changes
-#   * manual-> same, plus an option to publish a GitHub Release
+#   * push  -> rebuilds whenever an .iss (or this workflow) changes, then publishes a GitHub Release
+#   * manual-> same build; publish a release only when create_release is enabled
 
 on:
   push:
@@ -94,7 +94,7 @@ jobs:
           if-no-files-found: error
 
       - name: Create GitHub Release
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_release == true }}
+        if: ${{ github.event_name == 'push' || inputs.create_release == true }}
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

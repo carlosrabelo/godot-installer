@@ -11,7 +11,7 @@ Instaladores Windows para Godot Engine 3 e 4, gerados com Inno Setup para as má
 - Instala ou atualiza o Godot nas máquinas do laboratório com um clique
 - Atualiza a versão do engine com uma edição de uma linha em cada `Godot.iss`
 - Recompila os instaladores automaticamente no GitHub Actions quando os scripts mudam
-- Publica os instaladores como GitHub Releases a partir de uma execução manual do workflow
+- Publica os instaladores como GitHub Releases automaticamente no push para `master`
 - Mantém as instalações de Godot consistentes em todas as máquinas do laboratório
 
 ## Visão Geral
@@ -86,8 +86,8 @@ As versões do Godot ficam em um único define por script:
 Fluxo de trabalho:
 
 1. Atualize `MyAppVersion` em `godot3/Godot.iss` e/ou `godot4/Godot.iss`
-2. Faça push em `master` — o CI baixa o binário Windows `*-stable` correspondente e gera os dois instaladores
-3. Para publicar um GitHub Release, execute **Build Installers** via `workflow_dispatch` com **Publish a GitHub Release** habilitado
+2. Faça push em `master` — o CI baixa o binário Windows `*-stable` correspondente, gera os dois instaladores e publica um GitHub Release
+3. Para um rebuild manual sem release, execute **Build Installers** via `workflow_dispatch` (deixe **Publish a GitHub Release** desmarcado); habilite apenas quando quiser uma release a partir de uma execução manual
 
 Os artefatos de cada execução bem-sucedida também ficam disponíveis na página do run em Actions (`godot-installers`).
 

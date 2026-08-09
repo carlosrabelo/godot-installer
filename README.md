@@ -11,7 +11,7 @@ Windows installers for Godot Engine 3 and 4, built with Inno Setup for lab machi
 - Install or update Godot on lab machines with a single click
 - Bump engine versions with a one-line edit in each `Godot.iss` file
 - Rebuild installers automatically on GitHub Actions when scripts change
-- Publish installers as GitHub Releases from a manual workflow run
+- Publish installers as GitHub Releases automatically on push to `master`
 - Keep Godot setups consistent across computer lab machines
 
 ## Overview
@@ -86,8 +86,8 @@ Godot versions live in a single define per script:
 Workflow:
 
 1. Update `MyAppVersion` in `godot3/Godot.iss` and/or `godot4/Godot.iss`
-2. Push to `master` — CI downloads the matching `*-stable` Windows binary and builds both installers
-3. To publish a GitHub Release, run **Build Installers** via `workflow_dispatch` with **Publish a GitHub Release** enabled
+2. Push to `master` — CI downloads the matching `*-stable` Windows binary, builds both installers, and publishes a GitHub Release
+3. For a manual rebuild without a release, run **Build Installers** via `workflow_dispatch` (leave **Publish a GitHub Release** unchecked); enable it only when you want a release from a manual run
 
 Artifacts from every successful run are also available on the Actions run page (`godot-installers`).
 

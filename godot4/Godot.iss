@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Godot"
-#define MyAppVersion "4.7"
+#define MyAppVersion "4.7.1"
 #define MyAppPublisher "Juan Linietsky, Ariel Manzur and contributors"
 #define MyAppURL "https://godotengine.org/"
 #define MyAppExeName "Godot_v" + MyAppVersion + "-stable_win64.exe"
